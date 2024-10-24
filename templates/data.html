@@ -1,28 +1,125 @@
 <html>
     <head>
         <title>YOLOv8 Object Detection</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: #f0f4f8;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                color: #333;
+            }
+
+            h1 {
+                font-size: 2.5em;
+                color: #0066cc;
+                margin-bottom: 10px;
+            }
+
+            h2 {
+                font-size: 1.5em;
+                color: #444;
+                margin-top: 20px;
+                margin-bottom: 10px;
+            }
+
+            .container {
+                text-align: center;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                width: 700px;
+            }
+
+            img {
+                border-radius: 10px;
+                max-width: 100%;
+                height: auto;
+            }
+
+            #object-list {
+                list-style: none;
+                padding: 0;
+                font-size: 1.1em;
+            }
+
+            #object-list li {
+                background-color: #e6f7ff;
+                margin: 5px 0;
+                padding: 8px 10px;
+                border-radius: 8px;
+                color: #0066cc;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
+
+            .input-container {
+                margin-bottom: 15px;
+            }
+
+            input[type="text"] {
+                padding: 10px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+                width: 200px;
+                font-size: 1.1em;
+            }
+
+            button {
+                padding: 10px 15px;
+                background-color: #0066cc;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+            button:hover {
+                background-color: #005bb5;
+            }
+        </style>
     </head>
     <body>
-        <h1>Object Detection Video Stream</h1>
-        <img src="/video" width="640" height="480" />
-        <h2>Detected Objects:</h2>
-        <ul id="object-list"></ul>
+        <div class="container">
+            <h1>Object Detection Video Stream</h1>
+            <div class="input-container">
+                <input type="text" id="username" placeholder="Enter your username" />
+                <button onclick="setUsername()">Set Username</button>
+            </div>
+            <img src="/video" alt="Video Stream" />
+            <h2>Detected Objects:</h2>
+            <ul id="object-list"></ul>
+        </div>
 
         <script>
-        async function fetchObjects() {
-            const response = await fetch('/');
-            const data = await response.json();
-            const objectList = document.getElementById('object-list');
-            objectList.innerHTML = '';  // очищаем список
+            let username = '';
 
-            data.objects.forEach(obj => {
-                const listItem = document.createElement('li');
-                listItem.textContent = `${obj.class} (${obj.confidence * 100}%)`;
-                objectList.appendChild(listItem);
-            });
-        }
+            function setUsername() {
+                username = document.getElementById('username').value;
+                if (username) {
+                    alert(`Username set to: ${username}`);
+                }
+            }
 
-        setInterval(fetchObjects, 1000);  // обновляем список объектов каждую секунду
+            async function fetchObjects() {
+                const response = await fetch(`/objects?username=${encodeURIComponent(username)}`);
+                const data = await response.json();
+                const objectList = document.getElementById('object-list');
+                objectList.innerHTML = '';  // очищаем список
+
+                data.objects.forEach(obj => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${obj.class} (${obj.confidence * 100}%)`;
+                    objectList.appendChild(listItem);
+                });
+            }
+
+            setInterval(fetchObjects, 1000);  // обновляем список объектов каждую секунду
         </script>
     </body>
-    </html>
+</html>

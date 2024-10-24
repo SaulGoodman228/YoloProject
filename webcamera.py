@@ -1,4 +1,6 @@
+import requests
 from fastapi import FastAPI
+from fastapi.params import Query
 from fastapi.responses import JSONResponse, StreamingResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from ultralytics import YOLO
@@ -8,7 +10,7 @@ import threading
 from starlette.requests import Request
 
 app = FastAPI()
-
+user_username = "test"
 # Настройка Jinja2 для работы с шаблонами
 templates = Jinja2Templates(directory="templates")
 
@@ -51,6 +53,9 @@ def detect_objects():
                 cv2.putText(img, f"{class_name} {confidence}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 255), 2)
 
         detected_objects = objects
+
+        requests.post(url="http://127.0.0.1:8001/save", json={"username": user_username, "data": detected_objects})
+
         cv2.imshow('Webcam', img)
         if cv2.waitKey(1) == ord('q'):
             break
@@ -87,3 +92,10 @@ async def get_objects():
 @app.get("/webpage")
 async def video_feed(request: Request):
     return templates.TemplateResponse("data.html", {"request": request})
+
+@app.get("/objects")
+async def get_objects(username: str = Query(None)):
+    user_username = username
+    print(f"Username: {user_username}")
+
+    return {}
