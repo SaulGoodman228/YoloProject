@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <title>YOLOv8 Object Detection</title>
+    </head>
+    <body>
+        <h1>Object Detection Video Stream</h1>
+        <img src="/video" width="640" height="480" />
+        <h2>Detected Objects:</h2>
+        <ul id="object-list"></ul>
+
+        <script>
+        async function fetchObjects() {
+            const response = await fetch('/');
+            const data = await response.json();
+            const objectList = document.getElementById('object-list');
+            objectList.innerHTML = '';  // очищаем список
+
+            data.objects.forEach(obj => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${obj.class} (${obj.confidence * 100}%)`;
+                objectList.appendChild(listItem);
+            });
+        }
+
+        setInterval(fetchObjects, 1000);  // обновляем список объектов каждую секунду
+        </script>
+    </body>
+    </html>

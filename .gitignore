@@ -1,0 +1,9 @@
+datasets/
+
+
+/ProgramData/anaconda3/envs/TensorflowEnv/
+
+env/
+venv/
+*.pyc
+__pycache__/
